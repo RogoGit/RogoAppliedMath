@@ -28,22 +28,20 @@ class Node:
 
 def shannon_fano(nodes):
     length = len(nodes)
-    if length == 0:
-        return
-    if length == 1:
-        nodes[0].fano += "0"
+    # last nodes are here
+    if length <= 1:
         return
     if length == 2:
         nodes[0].fano += "0"
         nodes[1].fano += "1"
         return
 
-    # Figure out where to split the list.
+    # figuring out where to split the list.
     total = 0
     for i in range(length):
         total += nodes[i].probability
     second_half_total = 0
-    index = length
+    index = length  # index - where we have to split
 
     while (index >= 0) and (second_half_total <= (total - second_half_total)):
         index -= 1
@@ -54,6 +52,7 @@ def shannon_fano(nodes):
     if diff2 < diff1:
         index += 1
 
+    # appending to code
     for j in range(index):
         nodes[j].fano += "0"
 
@@ -62,6 +61,7 @@ def shannon_fano(nodes):
         nodes[k].fano += "1"
         k += 1
 
+    # recursion - going to new tree branch
     if length > 0:
         shannon_fano(nodes[0:index])
         shannon_fano(nodes[index:])
@@ -95,12 +95,14 @@ def main():
         # calculating symbol probability
         for entry in symb_dict:
             symb_dict[entry].probability = symb_dict[entry].frequency / ch_number
-            print(symb_dict[entry])
             if symb_dict[entry].probability != 0.0:
                 symb_list.append(symb_dict[entry])
 
+        # sorting nodes list
         symb_list.sort()
         symb_list.reverse()
+
+        # get shannon_fano encoding
         shannon_fano(symb_list)
         for i in symb_list:
             print(i)
