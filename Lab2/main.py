@@ -1,17 +1,21 @@
+from queue import PriorityQueue
+
+
 class Node:
 
-    # A node with a symbol, frequency, probability and code.
+    # A node with a symbol, frequency, probability and codes.
     # init node
-    def __init__(self, symbol=None, frequency=None, probability=None, fano=None):
+    def __init__(self, symbol=None, frequency=None, probability=None, fano=None, huffman=None):
         self.symbol = symbol  # symbol itself
         self.frequency = frequency  # frequency
         self.probability = probability  # probability
         self.fano = fano  # shannon-fano code
+        self.huffman = huffman  # huffman code
 
     def __str__(self):
         # string representation
-        return "Node(" + self.symbol.__repr__() + ", " + str(self.probability) + ", "  + self.fano + ") "
-        # + str(self.left_ch) + ", " + str(self.right_ch) + ", "
+        return "Node(" + self.symbol.__repr__() + ", " + str(self.probability) + ", " + self.fano + ", " \
+               + self.huffman + ")"
 
     def __repr__(self):
         # representation of the Node
@@ -69,11 +73,37 @@ def shannon_fano(nodes):
     return
 
 
+def huffman(nodes):
+
+    # recursion exit condition
+    if len(nodes) == 2:
+        return dict(zip(nodes.keys(), ["0", "1"]))
+
+    # creating temp structure for huffman encoding
+    huff_dict = nodes.copy()
+    # sorting by probability ang getting 2 min
+    sorted_huff_dict = sorted(nodes.items(), key=lambda node: node[1])
+    min_node_one = sorted_huff_dict[0][0]
+    min_node_two = sorted_huff_dict[1][0]
+    prob_one = huff_dict.pop(min_node_one)
+    prob_two = huff_dict.pop(min_node_two)
+
+    huff_dict[min_node_one + min_node_two] = prob_one + prob_two
+    # recursion + encoding
+    huffman_code_dict = huffman(huff_dict)
+    h_node = huffman_code_dict.pop(min_node_one + min_node_two)
+    huffman_code_dict[min_node_one] = h_node + "0"
+    huffman_code_dict[min_node_two] = h_node + "1"
+
+    return huffman_code_dict
+
+
 def main():
 
     ch_number = 0.0  # characters in text
     symb_dict = {}  # node instances
     symb_list = []  # symbols list
+    h_dict = {}  # for huffman
 
     print("Enter the filename")
     try:
@@ -89,7 +119,7 @@ def main():
             if ch in symb_dict:
                 symb_dict[ch].frequency += 1.0
             else:
-                new_symb = Node(ch, 0.0, 0.0, "")
+                new_symb = Node(ch, 0.0, 0.0, "", "")
                 symb_dict[ch] = new_symb
 
         # calculating symbol probability
@@ -106,6 +136,12 @@ def main():
         shannon_fano(symb_list)
         for i in symb_list:
             print(i)
+
+        # get huffman encoding
+        for entry in symb_dict.keys():
+            h_dict[entry] = symb_dict[entry].probability
+        huffman_res = huffman(h_dict)
+        print(huffman_res)
 
     except IOError:
         print("No such file found")
