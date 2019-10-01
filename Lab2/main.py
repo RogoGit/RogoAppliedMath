@@ -1,3 +1,4 @@
+import math
 from tabulate import tabulate
 
 
@@ -128,21 +129,32 @@ def main():
             if symb_dict[entry].probability != 0.0:
                 symb_list.append(symb_dict[entry])
 
+        for key in list(symb_dict.keys()):
+            if symb_dict[key].probability == 0.0:
+                del symb_dict[key]
+
         # sorting nodes list
         symb_list.sort()
         symb_list.reverse()
 
         # get shannon_fano encoding
         shannon_fano(symb_list)
-        # for i in symb_list:
-        #    print(i)
+
+        # get file entropy
+        entropy = 0.0
+        for item in symb_list:
+            entropy -= (item.probability * math.log2(item.probability))
+        print("\nFile entropy: " + str(entropy))
 
         # print shannon-fano
-        print("Shannon-Fano encoding: \n")
+        print("\nShannon-Fano encoding: \n")
         data_fano = []
+        summ_fano = 0.0
         for i in symb_list:
             data_fano.append([i.symbol, str(i.probability), i.fano, str(len(i.fano))])
+            summ_fano += float(len(i.fano))
         print(tabulate(data_fano, headers=['Symbol', 'Probability', 'Word', 'Length']))
+        print("\n Average length: " + str(summ_fano/len(symb_list)))
 
         # get huffman encoding
         for entry in symb_dict.keys():
@@ -150,11 +162,14 @@ def main():
         huffman_res = huffman(h_dict)
 
         # print huffman
-        print("\n Huffman encoding: \n")
+        print("\n\n Huffman encoding: \n")
         data_huff = []
+        summ_huff = 0.0
         for i in huffman_res.keys():
             data_huff.append([i, symb_dict[i].probability, huffman_res[i], len(huffman_res[i])])
+            summ_huff += float(len(huffman_res[i]))
         print(tabulate(data_huff, headers=['Symbol', 'Probability', 'Word', 'Length']))
+        print("\n Average length: " + str(summ_huff / len(huffman_res)))
 
     except IOError:
         print("No such file found")
