@@ -1,4 +1,4 @@
-from queue import PriorityQueue
+from tabulate import tabulate
 
 
 class Node:
@@ -134,14 +134,27 @@ def main():
 
         # get shannon_fano encoding
         shannon_fano(symb_list)
+        # for i in symb_list:
+        #    print(i)
+
+        # print shannon-fano
+        print("Shannon-Fano encoding: \n")
+        data_fano = []
         for i in symb_list:
-            print(i)
+            data_fano.append([i.symbol, str(i.probability), i.fano, str(len(i.fano))])
+        print(tabulate(data_fano, headers=['Symbol', 'Probability', 'Word', 'Length']))
 
         # get huffman encoding
         for entry in symb_dict.keys():
             h_dict[entry] = symb_dict[entry].probability
         huffman_res = huffman(h_dict)
-        print(huffman_res)
+
+        # print huffman
+        print("\n Huffman encoding: \n")
+        data_huff = []
+        for i in huffman_res.keys():
+            data_huff.append([i, symb_dict[i].probability, huffman_res[i], len(huffman_res[i])])
+        print(tabulate(data_huff, headers=['Symbol', 'Probability', 'Word', 'Length']))
 
     except IOError:
         print("No such file found")
