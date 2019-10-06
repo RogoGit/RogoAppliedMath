@@ -91,6 +91,9 @@ def main():
                                  lng=len(phrase_to_code))
         print("Decoded: " + str(decoded))
 
+        # compression
+        print("Compression ratio: " + str(len(str(encoded))/len(phrase_to_code)*100) + "%")
+
     except IOError:
         print("No such file found")
 
