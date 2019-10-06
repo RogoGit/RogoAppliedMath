@@ -36,6 +36,39 @@ def arith_encoding(letters, probability, str_to_code):
     return (left + right) / 2
 
 
+class SegmentDecode(Segment):
+    character = None  # letter for segment
+
+
+def segments_decode(letters, probability):
+    # defining segments for decoding
+    border = 0.0
+    # create segment for each letter
+    segments = [SegmentDecode() for i in range(len(letters))]
+    # defining decoding segment for each letter
+    for i in range(len(letters)):
+        segments[i].left = border
+        segments[i].right = border + probability[i]
+        segments[i].character = letters[i]
+        border = segments[i].right
+    return segments
+
+
+def arith_decoding(letters, probability, code, lng):
+    # segments and letters for them
+    segments = segments_decode(letters, probability)
+    # decoded string
+    decode = ""
+    # decoding
+    for i in range(lng):
+        for j in range(len(letters)):
+            if segments[j].left <= code < segments[j].right:
+                decode += segments[j].character
+                code = (code - segments[j].left) / (segments[j].right - segments[j].left)
+                break
+    return decode
+
+
 def main():
     print("Enter the filename")
     try:
@@ -52,6 +85,11 @@ def main():
         # encoding
         encoded = arith_encoding(letters=list(letters_set), probability=probability, str_to_code=phrase_to_code)
         print("Arithmetic encoding: " + str(encoded) + "\n")
+
+        # decoding
+        decoded = arith_decoding(letters=list(letters_set), probability=probability, code=encoded,
+                                 lng=len(phrase_to_code))
+        print("Decoded: " + str(decoded))
 
     except IOError:
         print("No such file found")
